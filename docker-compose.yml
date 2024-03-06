@@ -1,0 +1,76 @@
+version: '3'
+services:
+  #PHP
+  edu-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    container_name: edu-app
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - laravel-network
+    depends_on:
+      - edu-db
+
+  #Nginx
+  edu-server:
+    image: nginx:alpine
+    container_name: edu-server
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/:/etc/nginx/conf.d/
+    networks:
+      - laravel-network
+
+  #MySQL
+  edu-db:
+    image: mysql:8.3
+    container_name: edu-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: $DB_DATABASE
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql/
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - laravel-network
+
+  #Queue
+  edu-queue:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.queue
+    container_name: edu-queue
+    volumes:
+      - .:/var/www
+    working_dir: /var/www
+    networks:
+      - laravel-network
+    depends_on:
+      - edu-app
+      - edu-db
+
+#Networks
+networks:
+  laravel-network:
+    driver: bridge
+#Volumes
+volumes:
+  dbdata:
+    driver: local
