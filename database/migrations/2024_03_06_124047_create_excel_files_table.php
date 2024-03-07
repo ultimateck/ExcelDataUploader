@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('extention');
             $table->string('path')->nullable();
             $table->binary('file')->nullable();
-            $table->integer('sheets')->default(0);
+            $table->text('errors')->nullable();
             $table->integer('rows')->default(0);
             $table->integer('columns')->default(0);
             $table->string('status');

@@ -22,6 +22,7 @@ class ExcelFileUploader extends BaseController
         $rtnObj = $excelFileService->storeFileData($request->all());
         if ($rtnObj['error'] == false) {
             dispatch(new ProcessExcelData($rtnObj['excelFile']));
+            //$excelFileService->processFileData($rtnObj['excelFile']);
         }
         return Redirect::route('getUpload')
             ->with('message', $rtnObj['message']);
