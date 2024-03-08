@@ -7,6 +7,7 @@ use App\Models\ExcelFile;
 use App\Models\Item;
 use App\Imports\ExcelDataImport;
 use App\Support\DomainConst;
+use App\Exceptions\InvalidExcelFile;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -76,6 +77,12 @@ class ExcelFileService extends BaseService
         }
     }
 
+    public function getAllUploadedFiles(): Collection
+    {
+        $allFiles = ExcelFile::all();
+        return $allFiles;
+    }
+
     public function importExcel(string $path): Collection
     {
         $dataCollection = Excel::toCollection(new ExcelDataImport, $path);
@@ -86,13 +93,14 @@ class ExcelFileService extends BaseService
     {
         $items = [];
         foreach($dataCollection[0] as $key => $row) {
-            if (!$row->has('code') || !Str::startsWith($row->get('code'), 'IT')) {
-                continue;
+            if (!$row->has('code') || !$row->has('quantity') || !$row->has('price')) {
+                throw(new InvalidExcelFile("Required item columns are missing."));
             }
-            if (!$row->has('quantity') || !is_numeric($row->get('quantity'))) {
-                continue;
-            }
-            if (!$row->has('price') || !is_numeric($row->get('price'))) {
+            if (
+                !Str::startsWith($row->get('code'), 'IT') ||
+                !is_numeric($row->get('quantity')) ||
+                !is_numeric($row->get('price'))
+            ) {
                 continue;
             }
             

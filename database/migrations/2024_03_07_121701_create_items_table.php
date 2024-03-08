@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->integer('quantity')->default(0);
             $table->decimal('price', $precision = 8, $scale = 2);
             $table->timestamps();

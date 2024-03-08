@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('excel_files', function (Blueprint $table) {
             $table->id();
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->string('file_name');
             $table->string('extention');
             $table->string('path')->nullable();

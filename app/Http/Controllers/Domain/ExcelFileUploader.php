@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\View;
 
 class ExcelFileUploader extends BaseController
 {
-    public function getUpload()
+    public function getUpload(ExcelFileService $excelFileService)
     {
+        $uploadedFiles = $excelFileService->getAllUploadedFiles();
         return View::make('domain.excel_file_upload')
-            ->with('message', '');
+            ->with('uploadedFiles', $uploadedFiles);
     }
     
     public function postUpload(ExcelFileUploadRequest $request, ExcelFileService $excelFileService)
