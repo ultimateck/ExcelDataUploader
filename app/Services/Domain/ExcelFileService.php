@@ -34,7 +34,12 @@ class ExcelFileService extends BaseService
             $excelFile->status = DomainConst::PROCESSING_STATE_PENDING;
             $excelFile->processed = false;
             $excelFile->save();
-            $result = ['error' => false, 'message' => 'File Uploaded Successfully', 'excelFile' => $excelFile];
+            $result = [
+                'error' => false, 
+                'message' => 'File Uploaded Successfully', 
+                'excelFile' => $excelFile,
+                'storagePath' => $filePath
+            ];
         } catch (Exception $e) {
             Log::channel('stderr')->info($e->getMessage());
             $result = ['error' => true, 'message' => $e->getMessage()];

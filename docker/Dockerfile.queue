@@ -6,9 +6,12 @@ WORKDIR /var/www/
 RUN apt update && apt install -y \
     git \
     curl \
-    zip
+    zip \
+    zlib1g-dev \
+    libpng-dev \
+    libzip-dev
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+RUN docker-php-ext-install mysqli pdo pdo_mysql gd zip
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 # Install Supervisor for process control

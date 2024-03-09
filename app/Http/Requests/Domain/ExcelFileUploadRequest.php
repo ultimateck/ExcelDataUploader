@@ -15,7 +15,7 @@ class ExcelFileUploadRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'excel-file' => 'required|file|mimes:csv,xlxs|max:2048'
+            'excel-file' => 'required|file|mimes:csv,xlsx,|max:2048'
         ];
     }
 }
