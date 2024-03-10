@@ -20,7 +20,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY . /var/www
 RUN chown -R www-data:www-data /var/www/storage
 # Run Composer install
-RUN composer install
+RUN cd /var/www && composer install
 
 EXPOSE 9000
 CMD ["php-fpm"]
