@@ -127,6 +127,8 @@ create database testing;
 Run the artisan test command using the testing database.
 ```bash
 docker exec -it edu-app /bin/bash
+php artisan key:generate --env=testing
+php artisan migrate --env=testing
 php artisan test
 ```
 
