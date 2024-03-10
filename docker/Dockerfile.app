@@ -23,4 +23,4 @@ RUN chown -R www-data:www-data /var/www/storage
 RUN cd /var/www && composer install
 
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["sh", "/var/www/docker/entrypoint.sh"]
