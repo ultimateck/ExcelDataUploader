@@ -11,7 +11,19 @@ PHP Laravel excel file upload with queue processing and docker compose setup
 ### Prerequisites
 - Docker and docker-compose installed
 - Setup .env for configurations
-- port 8080 and 3306 available in host machine. (This can be configured in `docker-compose.yml`)
+- Setup .env.testing for test configurations (optional)
+- port 8080 and 3306 available in the host machine. (This can be configured in `docker-compose.yml`)
+
+#### Docker configs
+Project root consist of following directories and files for dockerization of the application
+- docker-compose.yml - all docker services are configured in here
+- docker directory
+    - mysql/my.cnf - (Optional) Mysql configuration
+    - nginx/nginx.conf - Nginx configuration file
+    - php/local.ini - PHP configurations
+    - Dockerfile.app - edu-app docker file
+    - Dockerfile.queue - edu-queue docker file
+    - worker.conf - Supervisord configuration
 
 #### Setup .env file
 In the project root directory create new `.env` file using `.env.example`. Modify following configurations in the `.env` file.
@@ -24,7 +36,7 @@ DB_HOST=edu-db
 DB_PORT=3306
 DB_DATABASE=laravel
 DB_USERNAME=root
-DB_PASSWORD=root # set any password for root.
+DB_PASSWORD=root
 
 # Queue configs
 QUEUE_CONNECTION=database
@@ -63,11 +75,57 @@ exit
 #### App startup
 Once above steps complete, the app will start on the configured port (ex: 8080)
 
-Use web browser to open the frontend http://localhost:8080/upload and strat uploading excel files.
+Use web browser to open the frontend http://localhost:8080/upload and start uploading excel files.
+
+#### Sample Excel files
+Excel file format for uploading.
+
+| Code | Description | Quantity | Price |
+| ----------- | ----------- | ----------- | ----------- |
+| IT001 | Test item 1 | 5 | 12.00 |
+| IT002 | Test item 2 | 2 | 6.50 |
+
+**Require fields**
+- `Code`
+- `Quantity`
+- `Price`
+
+Example excel files can be found under  [/tests/Files](/teste/Files) directory. These files can be used for testing.
+
+- items.xlsx
+- items-invalid-coloumns.xlsx
+- items-invalid-rows.xlsx
 
 ### Run Tests
 ```bash
-# login to edu-app shell and run artisan test
+# login to edu-app shell and run artisan test on default databse
+docker exec -it edu-app /bin/bash
+php artisan test
+```
+
+#### **Run tests in test env**
+Add following line to `phpunit.xml`
+```xml
+<env name="DB_DATABASE" value="testing" />
+```
+
+Setup `.env.testing` environment file and add database name
+```bash
+DB_DATABASE=testing
+```
+
+Create testing database in MySQL server. Connect to edu-db container shell and login to MySQL CLI.
+```bash
+docker exec -it edu-db /bin/bash
+mysql -u root -p
+Enter password:
+
+# Once login to MySQl server create testing database
+create database testing;
+```
+
+Run the artisan test command using the testing database.
+```bash
 docker exec -it edu-app /bin/bash
 php artisan test
 ```

@@ -22,7 +22,7 @@ class ExcelFileUploadTest extends TestCase
     }
 
     /**
-     * Test /upload route post request without data
+     * Test /upload route post request with invalid file type
      */
     public function test_file_upload_route_with_invalid_mime_type(): void
     {
@@ -37,11 +37,29 @@ class ExcelFileUploadTest extends TestCase
     }
 
     /**
-     * Test /upload route post request without data
+     * Test /upload route post request with valid excel
      */
-    public function test_file_upload_route_with_valid_file(): void
+    public function test_file_upload_route_with_valid_excel_file(): void
     {
         $file = UploadedFile::fake()->createWithContent('items.xlsx', file_get_contents('tests/Files/items.xlsx'));
+        $response = $this->post('/upload',[
+            'excel-file' => $file,
+            'description' => 'Test File'
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('message');
+        $this->assertTrue(Storage::exists('public/uploads/' . $file->hashName()));
+
+        Storage::delete('public/uploads/' . $file->hashName());
+    }
+
+    /**
+     * Test /upload route post request with valid excel
+     */
+    public function test_file_upload_route_with_valid_csv_file(): void
+    {
+        $file = UploadedFile::fake()->createWithContent('items.csv', file_get_contents('tests/Files/items.csv'));
         $response = $this->post('/upload',[
             'excel-file' => $file,
             'description' => 'Test File'

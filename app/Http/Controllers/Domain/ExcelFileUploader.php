@@ -8,6 +8,7 @@ use App\Services\Domain\ExcelFileService;
 use App\Jobs\ProcessExcelData;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Response;
 
 class ExcelFileUploader extends BaseController
 {
@@ -23,7 +24,9 @@ class ExcelFileUploader extends BaseController
         $rtnObj = $excelFileService->storeFileData($request->all());
         if ($rtnObj['error'] == false) {
             dispatch(new ProcessExcelData($rtnObj['excelFile']));
-            //$excelFileService->processFileData($rtnObj['excelFile']);
+        }
+        if ($request->wantsJson()) {
+            return Response::json(['success' => true, 'message' => $rtnObj['message']]);
         }
         return Redirect::route('getUpload')
             ->with('message', $rtnObj['message']);

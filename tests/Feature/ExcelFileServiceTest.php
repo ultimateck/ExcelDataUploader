@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Services\Domain\ExcelFileService;
 use App\Exceptions\InvalidExcelFile;
@@ -18,6 +19,11 @@ class ExcelFileServiceTest extends TestCase
      */
     public function test_store_file_data(): void
     {
+        $uploads_path = storage_path('app/public/uploads');
+        if (!File::isDirectory($uploads_path)) {
+            File::makeDirectory($uploads_path, 0777, false, true);
+        }
+        chown($uploads_path, 'www-data');
         $excelFileService = new ExcelFileService();
         $file = UploadedFile::fake()->createWithContent('items.xlsx', file_get_contents('tests/Files/items.xlsx'));
         $rtn = $excelFileService->storeFileData(['excel-file' => $file, 'description' => 'Test Description']);
@@ -48,7 +54,7 @@ class ExcelFileServiceTest extends TestCase
     /**
      * Test getAllUploadedFiles() method.
      */
-    public function test_all_uploaded_files(): void
+    public function test_get_all_uploaded_files(): void
     {
         $excelFileService = new ExcelFileService();
         $allFiles = $excelFileService->getAllUploadedFiles();
